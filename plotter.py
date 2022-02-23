@@ -11,7 +11,6 @@ class Plotter:
     def show(self):
         self.plt.show(block=True)
 
-
     def plot_only_specific_element(self,
                                    c1_env1,
                                    axis=0, save_plot=False):
@@ -29,7 +28,6 @@ class Plotter:
         ax1.plot(c1_env1.t, c1_env1.history.sol_ref[axis, :].T)
         ax1.plot(c1_env1.t, c1_env1.history.sol_x[axis, :].T)
 
-
         ax1.set_xlabel('Time(second)')
         ax1.set_ylabel(ylabel + ' Value')
         ax1.legend(legend, shadow=True)
@@ -38,7 +36,6 @@ class Plotter:
         if save_plot:
             self.plt.savefig('results/' + self.name +
                              'plot_only_specific_element.png')
-
 
     def plot_reward(self, env1, save_plot=False):
         # Plotting the simulation recorded
@@ -49,13 +46,12 @@ class Plotter:
         ax1.set_xlabel('Time(second)')
         ax1.set_ylabel('Reward')
         ax1.legend(['Reward'], shadow=True)
-        ax1.set_ylim((-1.1, 0.1))
-        ax1.set_title('Deterministic Linear Quadcopter Reward Values wrt t')
+        # ax1.set_ylim((-1.1, 0.1))
+        # ax1.set_title('Deterministic Linear Quadcopter Reward Values wrt t')
 
         if save_plot:
             self.plt.savefig('results/' + self.name + 'plot_reward.png')
 
-    # KEEP
     def plot_actions(self, env1, save_plot=False):
         # Plotting the simulation recorded
         fig, ax1 = self.plt.subplots(1, 1)
@@ -63,14 +59,12 @@ class Plotter:
         self.plt.tight_layout(pad=5)
         ax1.plot(env1.t, env1.history.sol_actions[:].T)
         ax1.set_xlabel('Time(second)')
-        ax1.set_ylabel('Action(Torque)')
-        ax1.legend(['U1', 'U2', 'U3'], shadow=True)
-        ax1.set_title('Deterministic Linear Quadcopter - ' +
-                      'Action(Torque) wrt t')
+        ax1.set_ylabel('Action')
+        ax1.legend(['U1', 'U2'], shadow=True)
+        ax1.set_title('Bicycle Model - Action wrt t')
 
         if save_plot:
             self.plt.savefig('results/' + self.name + 'plot_actions.png')
-
 
     def plot_all_with_reference(self, env1, save_plot=False):
         # Plotting the simulation recorded
@@ -81,13 +75,13 @@ class Plotter:
         ax1.plot(env1.t, env1.history.sol_x[:].T)
         ax1.set_xlabel('Time(second)')
         ax1.set_ylabel('Attitude and Angular Rate Values')
-        ax1.legend(['Ref phi(rad)', 'Ref phidot(rad/s)', 'Ref theta(rad)',
-                    'Ref thetadot(rad/s)', 'Ref psi(rad)', 'Ref psidot(rad/s)',
-                    'phi(rad)', 'phidot(rad/s)', 'theta(rad)',
-                    'thetadot(rad/s)', 'psi(rad)', 'psidot(rad/s)'],
+        ax1.legend(['Ref x1(rad)', 'Ref x2(rad/s)', 'Ref x3(rad)',
+                    'Ref x4(rad/s)',
+                    'x1(rad)', 'x2(rad/s)', 'x3(rad)',
+                    'x4(rad/s)'],
                    shadow=True)
-        ax1.set_title('Deterministic Linear Quadcopter Attitude and ' +
-                      'Angular Rate Values wrt t')
+        # ax1.set_title('Deterministic Linear Quadcopter Attitude and ' +
+        #               'Angular Rate Values wrt t')
 
         if save_plot:
             self.plt.savefig('results/' + self.name +

@@ -8,7 +8,7 @@ For this project, quadcopter rotational dynamics (https://arxiv.org/abs/2202.070
 conda create -n mpc python=3.8
 
 conda activate mpc
-conda install -c conda-forge libgfortran
+conda install -c conda-forge libgfortran flake8 -y
 pip install do-mpc scipy numpy gym
 ```
 

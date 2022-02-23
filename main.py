@@ -2,47 +2,31 @@ import numpy as np
 import sys
 import time
 
-from quad import StochasticQuad
-
 n_horizon = 20
 control_freq = 50
 simulation_freq = 250
 t_end = 5
 
 
-from linear_mpc import Linear_MPC
-from quad import DeterministicQuad, linear_quad_dynamics
-import time
-
-
-def test_controller(controller, t_end, plot=False, save_plot=False,
-                    constant_reference=None):
-
-    if constant_reference is None:
-        constant_reference = np.array([1, 0, 1, 0, 1, 0])
-    custom_u_high = np.array([0.1, 0.1, 0.1])
+def test_controller(controller, t_end, plot=False, save_plot=False):
 
     env1 =\
         createEnvs(t_end=t_end,
                    simulation_freq=simulation_freq,
                    control_freq=control_freq,
-                   random_state_seed=0,
-                   set_custom_u_limit=False,
-                   custom_u_high=custom_u_high,
-                   set_constant_reference=True,
-                   constant_reference=constant_reference)
+                   )
 
     num_episode = 1
     simulate_envs(controller, env1, num_episode)
-    calculateControllerMetrics(env1)
+    # calculateControllerMetrics(env1)
 
     if plot:
         from plotter import Plotter
         plotter = Plotter(type(controller).__name__)
-        plotter.plot_only_specific_element(env1,
-                                           save_plot=save_plot)
-        plotter.plot_only_specific_element(env1,
-                                           save_plot=save_plot, axis=1)
+        # plotter.plot_only_specific_element(env1,
+        #                                    save_plot=save_plot)
+        # plotter.plot_only_specific_element(env1,
+        #                                    save_plot=save_plot, axis=1)
         plotter.plot_all_with_reference(env1,
                                         save_plot=save_plot)
         plotter.plot_reward(env1, save_plot=save_plot)
@@ -50,7 +34,6 @@ def test_controller(controller, t_end, plot=False, save_plot=False,
         if plot:
             plotter.show()
     return env1
-
 
 
 def calculateControllerMetrics(env):
@@ -115,39 +98,30 @@ def simulate_envs(controller, env1, num_episode):
 
 
 def createEnvs(t_end, simulation_freq,
-               control_freq, random_state_seed,
-               set_custom_u_limit,
-               custom_u_high,
-               set_constant_reference,
-               constant_reference,
-               dynamics_state=np.array([3.14/4, 0, 0, 0, 0, 0]),
-               eval_env=True):
-    from quad import DeterministicQuad
-    from quad import linear_quad_dynamics
+               control_freq,
+               dynamics_state=np.array([0, 0, 0, 0])):
+
+    from bicycle_model import DeterministicVehicle
+    from bicycle_model import nonlinear_vehicle_dynamics
 
     # Linear deterministic quadcopter
-    env1 = DeterministicQuad(linear_quad_dynamics, t_end=t_end,
-                             simulation_freq=simulation_freq,
-                             control_freq=control_freq, random_state_seed=0,
-                             dynamics_state=dynamics_state,
-                             set_custom_u_limit=set_custom_u_limit,
-                             custom_u_high=custom_u_high,
-                             set_constant_reference=True,
-                             constant_reference=constant_reference,
-                             eval_env=eval_env)
-
+    env1 = DeterministicVehicle(nonlinear_vehicle_dynamics, t_end=t_end,
+                                simulation_freq=simulation_freq,
+                                control_freq=control_freq,
+                                dynamics_state=dynamics_state,
+                                )
     return env1
 
 
 def test_NonlinearMPC(plot=False, save_plot=False, loadmodel=False):
     from nonlinear_mpc import Nonlinear_MPC
-    from quad import DeterministicQuad, linear_quad_dynamics
-    import time
+    from bicycle_model import DeterministicVehicle
+    from bicycle_model import nonlinear_vehicle_dynamics
 
-    env = DeterministicQuad(linear_quad_dynamics, t_end=t_end,
-                            simulation_freq=250, control_freq=50,
-                            keep_history=False)
-
+    env = DeterministicVehicle(nonlinear_vehicle_dynamics, t_end=t_end,
+                               simulation_freq=250,
+                               control_freq=50
+                               )
     start = time.time()
     print("*** Function: ", sys._getframe().f_code.co_name, "***")
     nonlinear_mpc = Nonlinear_MPC(t_end=t_end,
@@ -155,31 +129,12 @@ def test_NonlinearMPC(plot=False, save_plot=False, loadmodel=False):
                                   c_step=1/control_freq,
                                   s_step=1/simulation_freq,
                                   env=env)
+    # nonlinear_mpc.test_mpc()
+
     test_controller(nonlinear_mpc, t_end, plot=plot, save_plot=save_plot)
     end = time.time()
     print(end-start)
 
 
-def test_LinearMPC(plot=False, save_plot=False, loadmodel=False):
-    from linear_mpc import Linear_MPC
-    import time
-    from quad import DeterministicQuad, linear_quad_dynamics
-    env = DeterministicQuad(linear_quad_dynamics, t_end=t_end,
-                            simulation_freq=250, control_freq=50,
-                            keep_history=False)
-
-    start = time.time()
-    print("*** Function: ", sys._getframe().f_code.co_name, "***")
-    linear_mpc = Linear_MPC(t_end=t_end,
-                            n_horizon=n_horizon,
-                            c_step=1/control_freq,
-                            s_step=1/simulation_freq,
-                            env=env)
-    test_controller(linear_mpc, t_end, plot=plot, save_plot=save_plot)
-    end = time.time()
-    print(end-start)
-
-
-plot=True
-test_LinearMPC(plot)
-# test_NonlinearMPC(plot)
+plot = True
+test_NonlinearMPC(plot)
